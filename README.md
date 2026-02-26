@@ -8,7 +8,7 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 ## React Compiler
-
+hi
 The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
 
 Note: This will impact Vite dev & build performances.
