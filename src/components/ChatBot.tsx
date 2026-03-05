@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Close, ChatBubble } from '@mui/icons-material'
 import '../styles/ChatBot.css'
+import { API_BASE } from '../config/apiBase'
 
 interface Message {
   id: string
@@ -8,8 +9,6 @@ interface Message {
   sender: 'user' | 'bot'
   timestamp: Date
 }
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend'
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false)

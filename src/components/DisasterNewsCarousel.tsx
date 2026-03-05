@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Warning, TrendingUp } from '@mui/icons-material';
+import { API_BASE } from '../config/apiBase';
 
 type NewsArticle = {
   title: string;
@@ -8,8 +9,6 @@ type NewsArticle = {
   source: { name: string };
   publishedAt: string;
 };
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend';
 
 export default function DisasterNewsCarousel() {
   const [news, setNews] = useState<NewsArticle[]>([]);

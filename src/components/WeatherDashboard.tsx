@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from '../config/apiBase';
 
 type WeatherData = any;
 type NewsArticle = {
@@ -7,8 +8,6 @@ type NewsArticle = {
   url: string;
   source: { name: string };
 };
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend';
 
 export default function WeatherDashboard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);

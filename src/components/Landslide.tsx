@@ -1,8 +1,7 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/landslide.css'
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend'
+import { API_BASE } from '../config/apiBase'
 
 function Landslide() {
   const [file, setFile] = useState<File | null>(null)

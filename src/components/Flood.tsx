@@ -5,8 +5,7 @@ import '../styles/Flood.css'
 import MapView from './MapView'
 import PredictionPanel from './PredictionPanel'
 import type { Station, PredictionResult, StationInfo } from '../types'
-
-const BACKEND_URL = import.meta.env.VITE_API_BASE || import.meta.env.VITE_BACKEND_URL || '/backend'
+import { API_BASE as BACKEND_URL } from '../config/apiBase'
 const API = `${BACKEND_URL}/flood`
 
 function Flood() {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Newspaper, OpenInNew, TrendingUp, Schedule } from '@mui/icons-material';
+import { API_BASE } from '../config/apiBase';
 
 type NewsArticle = {
   title: string;
@@ -9,8 +10,6 @@ type NewsArticle = {
   publishedAt: string;
   urlToImage?: string;
 };
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend';
 
 export default function NewsCard() {
   const [news, setNews] = useState<NewsArticle[]>([]);

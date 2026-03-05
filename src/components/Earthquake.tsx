@@ -3,8 +3,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Link } from 'react-router-dom'
 import '../styles/landslide.css'
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend'
+import { API_BASE } from '../config/apiBase'
 
 function Earthquake() {
   const [latitude, setLatitude] = useState('')

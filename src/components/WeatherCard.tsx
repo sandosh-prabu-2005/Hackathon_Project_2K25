@@ -3,10 +3,9 @@ import { Cloud, WaterDrop, Visibility, Brightness4, Compress, Air, Opacity, Grai
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
+import { API_BASE } from '../config/apiBase';
 
 type WeatherData = any;
-
-const API_BASE = import.meta.env.VITE_API_BASE || '/backend';
 
 export default function WeatherCard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
