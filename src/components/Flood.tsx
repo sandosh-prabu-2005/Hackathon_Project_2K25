@@ -16,12 +16,22 @@ function Flood() {
   const [selectedStation, setSelectedStation] = useState<StationInfo | null>(null)
   const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
 
   /* ===============================
      FETCH STATIONS
   ================================ */
   useEffect(() => {
     fetchStations()
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1024)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const fetchStations = async () => {
@@ -136,32 +146,13 @@ function Flood() {
           </h1>
         </div>
       </header>
-              Select Station from Map
-      {/* SAME STRUCTURE AS EARTHQUAKE */}
-
-            <button
-              onClick={useMyLocation}
-              style={{ width: '100%', marginTop: 12, padding: '10px 12px', borderRadius: 8, background: 'linear-gradient(90deg,#06b6d4,#0ea5e9)', color: '#fff', border: 'none', cursor: 'pointer' }}
-            >
-              <i className="fas fa-location-arrow" style={{ marginRight: 8 }}></i>
-              Use My Location
-            </button>
-      <div
-        style={{
-          display: 'flex',
-          gap: 20,
-          alignItems: 'stretch',
-          maxWidth: '100%',
-          margin: '18px auto',
-          paddingLeft: 20,
-          paddingRight: 20
-        }}
-      >
+      <div className="two-pane-layout" style={{ flexDirection: isMobile ? 'column' : 'row' }}>
         {/* MAP (LEFT) */}
         <div
+          className="map-pane"
           style={{
             flex: 1,
-            minHeight: 620,
+            minHeight: isMobile ? 360 : 620,
             borderRadius: 12,
             overflow: 'hidden',
             background: '#181f2e'
@@ -190,8 +181,8 @@ function Flood() {
         </div>
 
         {/* PANEL (RIGHT) */}
-        <div style={{ width: 500, minHeight: 620 }} className="panel" aria-hidden={false}>
-          <div style={{ position: 'relative', width: '100%', padding: 16, overflowY: 'scroll', maxHeight: 620 }}>
+        <div style={{ width: isMobile ? '100%' : 500, minHeight: isMobile ? 'auto' : 620 }} className="panel side-pane" aria-hidden={false}>
+          <div style={{ position: 'relative', width: '100%', padding: 16, overflowY: isMobile ? 'visible' : 'scroll', maxHeight: isMobile ? 'none' : 620 }}>
             <i
               className="fas fa-trash"
               style={{
@@ -215,6 +206,13 @@ function Flood() {
             >
               Station Information
             </h3>
+            <button
+              onClick={useMyLocation}
+              style={{ width: '100%', marginBottom: 12, padding: '10px 12px', borderRadius: 8, background: 'linear-gradient(90deg,#06b6d4,#0ea5e9)', color: '#fff', border: 'none', cursor: 'pointer' }}
+            >
+              <i className="fas fa-location-arrow" style={{ marginRight: 8 }}></i>
+              Use My Location
+            </button>
 
             {/* FLOOD INPUTS (Station-based, NOT manual) */}
             {!selectedStation && (
@@ -236,7 +234,7 @@ function Flood() {
               <div
                 style={{
                   marginTop: 8,
-                  maxHeight: 280,
+                  maxHeight: isMobile ? 'none' : 280,
                   paddingRight: 8,
                   display: 'flex',
                   flexDirection: 'column',
@@ -253,7 +251,7 @@ function Flood() {
                     background: 'rgba(34,197,94,0.1)',
                     border: '1px solid rgba(34,197,94,0.2)',
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                     gap: 8
                   }}
                 >
@@ -279,7 +277,7 @@ function Flood() {
                     background: 'rgba(168,85,247,0.1)',
                     border: '1px solid rgba(168,85,247,0.2)',
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                     gap: 8
                   }}
                 >
@@ -305,7 +303,7 @@ function Flood() {
                     background: 'rgba(14,165,233,0.1)',
                     border: '1px solid rgba(14,165,233,0.2)',
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
                     gap: 8
                   }}
                 >

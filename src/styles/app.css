@@ -267,3 +267,130 @@
 .section-title{ position:relative; display:inline-block }
 .section-title::after{ content:''; height:4px; width:48px; display:block; background:#dc2626; margin-top:8px; border-radius:4px }
 
+/* Shared split-layout helpers for map/panel pages */
+.two-pane-layout{
+  display:flex;
+  gap:20px;
+  align-items:stretch;
+  max-width:100%;
+  margin:18px auto;
+  padding-left:20px;
+  padding-right:20px;
+}
+.map-pane{ flex:1; min-width:0; }
+.side-pane{ width:500px; min-width:0; }
+
+/* Home page mobile UX */
+.home-root .home-card{
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+@media (max-width:1024px){
+  .page{ padding:12px 10px 18px; }
+  .hero.hero-compact{ min-height:96px; padding:10px 0; }
+  .hero.hero-compact h1{ font-size:1.15rem; line-height:1.3; padding-right:6px; }
+  .page .panel{
+    width:100% !important;
+    max-width:none !important;
+    min-width:0 !important;
+  }
+  .two-pane-layout{
+    flex-direction:column !important;
+    gap:12px;
+    padding-left:12px;
+    padding-right:12px;
+    margin-top:12px;
+  }
+  .map-pane{ width:100%; }
+  .side-pane{
+    width:100% !important;
+    min-height:auto !important;
+  }
+
+  .home-root{
+    padding:22px 12px;
+    min-height:auto;
+  }
+  .home-root .header-inner{
+    height:auto;
+    gap:10px;
+    padding:8px 0;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .home-root .nav-links{ display:none; }
+  .home-root .home-hero{
+    min-height:auto !important;
+    padding-top:30px !important;
+    padding-bottom:30px !important;
+  }
+  .home-root .home-hero-inner{ max-width:100% !important; }
+  .home-root .hero-pill{
+    margin-bottom:16px !important;
+    padding:8px 14px !important;
+    font-size:12px !important;
+  }
+  .home-root .hero-title{
+    font-size:clamp(1.9rem, 8vw, 2.6rem) !important;
+    margin-bottom:16px !important;
+    line-height:1.15 !important;
+  }
+  .home-root .lead{
+    font-size:0.98rem !important;
+    margin-bottom:22px !important;
+    line-height:1.55 !important;
+  }
+  .home-root .home-hero-grid{
+    grid-template-columns:1fr !important;
+    gap:14px !important;
+  }
+  .home-root .home-card{
+    padding:18px !important;
+    border-radius:14px !important;
+    gap:12px !important;
+  }
+  .home-root .home-roadmap-card{
+    grid-column:auto !important;
+    margin-top:8px !important;
+  }
+  .home-root .home-weather-section{
+    padding:36px 10px !important;
+  }
+  .home-root .home-section-inner{
+    max-width:100% !important;
+  }
+  .home-root .home-weather-grid{
+    grid-template-columns:1fr !important;
+    gap:14px !important;
+  }
+  .home-root .home-features-section,
+  .home-root .home-tech-section{
+    padding-top:64px !important;
+    padding-bottom:64px !important;
+  }
+  .home-root .features{ gap:16px !important; }
+  .home-root .home-feature-card,
+  .home-root .home-tech-card{
+    padding:20px !important;
+  }
+  .home-root .home-tech-grid{
+    grid-template-columns:1fr !important;
+    gap:16px !important;
+  }
+  .home-root .back-to-top{
+    right:14px;
+    bottom:86px;
+  }
+}
+
+@media (max-width:640px){
+  .home-root .hero-title{ font-size:1.75rem !important; }
+  .home-root .home-card h3{ font-size:1.05rem !important; }
+  .home-root .home-card p{
+    font-size:0.9rem !important;
+    line-height:1.5 !important;
+  }
+  .home-root .home-card svg{ font-size:1.45rem !important; }
+  .home-root .site-footer{ padding:30px 0; }
+}
+

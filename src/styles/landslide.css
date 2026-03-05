@@ -231,7 +231,33 @@ img {
 }
 
 @media (max-width: 720px) {
-    .hero { flex-direction: column; align-items: flex-start; }
+    .hero {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 14px 12px 14px 56px;
+      gap: 10px;
+    }
+    .panel {
+      margin-top: 12px;
+      padding: 10px;
+    }
+    .controls {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .controls .btn-group {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .controls .btn-group button {
+      width: 100%;
+    }
+    .risk-card {
+      width: 100%;
+      min-width: 0;
+    }
 }
 
 /* Back link shown in header */

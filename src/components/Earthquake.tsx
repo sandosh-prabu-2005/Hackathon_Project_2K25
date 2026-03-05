@@ -13,9 +13,19 @@ function Earthquake() {
   const [month, setMonth] = useState('')
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<L.Map | null>(null)
   const marker = useRef<L.Marker | null>(null)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1024)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
@@ -153,15 +163,15 @@ function Earthquake() {
         </div>
       </header>
 
-      <div style={{ display: 'flex', gap: 20, alignItems: 'stretch', maxWidth: '100%', margin: '18px auto', paddingLeft: 20, paddingRight: 20 }}>
-        <div id="map" ref={mapRef} style={{ flex: 1, minHeight: 620, borderRadius: 12, overflow: 'hidden' }} />
+      <div className="two-pane-layout" style={{ flexDirection: isMobile ? 'column' : 'row' }}>
+        <div id="map" ref={mapRef} className="map-pane" style={{ minHeight: isMobile ? 360 : 620, borderRadius: 12, overflow: 'hidden' }} />
 
-        <div style={{ width: 500, minHeight: 620 }} className="panel" aria-hidden={false}>
-          <div style={{ position: 'relative', width: '100%' }}>
+        <div style={{ width: isMobile ? '100%' : 500, minHeight: isMobile ? 'auto' : 620 }} className="panel side-pane" aria-hidden={false}>
+          <div style={{ position: 'relative', width: '100%', padding: isMobile ? 12 : 0 }}>
             <i className="fas fa-trash" style={{ position: 'absolute', right: 8, top: 8, color: 'var(--muted)', cursor: 'pointer' }} onClick={clearInputs} title="Clear All"></i>
             <h3 style={{ color: 'var(--accent-2)', margin: '8px 0 12px', textAlign: 'center', fontWeight: 600 }}>Location Input</h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, color: 'var(--muted)' }}>
                   <i className="fas fa-map-marker-alt" style={{ marginRight: 6, color: '#ef4444' }}></i> Latitude
@@ -208,9 +218,9 @@ function Earthquake() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 12, flexDirection: isMobile ? 'column' : 'row' }}>
               <button onClick={updateMarkerFromInput} style={{ flex: 1 }} className="primary"><i className="fas fa-crosshairs" style={{ marginRight: 8 }}></i> Update</button>
-              <button onClick={getLocation} style={{ padding: '8px 10px', borderRadius: 8, background: 'linear-gradient(90deg,#10b981,#059669)', color: '#fff', border: 'none', cursor: 'pointer' }}><i className="fas fa-location-arrow"></i></button>
+              <button onClick={getLocation} style={{ padding: '8px 10px', borderRadius: 8, background: 'linear-gradient(90deg,#10b981,#059669)', color: '#fff', border: 'none', cursor: 'pointer', minWidth: isMobile ? '100%' : 44 }}><i className="fas fa-location-arrow"></i></button>
             </div>
 
             <button onClick={predict} disabled={loading} style={{ width: '100%', marginTop: 10 }} className="primary"><i className="fas fa-brain" style={{ marginRight: 8 }}></i>{loading ? 'Predicting...' : 'Predict Risk'}</button>

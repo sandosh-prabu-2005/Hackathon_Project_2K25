@@ -11,6 +11,16 @@ export default function WeatherCard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [location, setLocation] = useState<{ lat: number; lon: number; name: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 640);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 640);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Get location name from reverse geocoding
   const getLocationName = async (lat: number, lon: number) => {
@@ -74,7 +84,7 @@ export default function WeatherCard() {
   };
 
   return (
-    <div style={styles.card}>
+    <div style={{ ...styles.card, padding: isMobile ? 18 : 28 }}>
       {/* Header */}
       <div style={styles.header}>
         <h3 style={styles.title}>TODAY'S WEATHER</h3>
@@ -117,7 +127,7 @@ export default function WeatherCard() {
       </div>
 
       {/* Weather Grid */}
-      <div style={styles.weatherGrid}>
+      <div style={{ ...styles.weatherGrid, gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 12 : 16 }}>
         {/* Temperature */}
         <div style={{ ...styles.weatherItem, background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 100%)', gridColumn: '1 / -1' }}>
           <div style={styles.tempContainer}>

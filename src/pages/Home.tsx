@@ -26,9 +26,9 @@ import DisasterNewsCarousel from "../components/DisasterNewsCarousel";
 
 export default function Home() {
   return (
-    <div className="container site" style={{ background: "#000" }}>
+    <div className="container site home-root" style={{ background: "#000" }}>
       {/* Professional Header */}
-      <header style={{ background: "#000" }}>
+      <header className="home-header" style={{ background: "#000" }}>
         <div className="header-inner">
           <div className="brand">
             <div className="logo">
@@ -50,10 +50,10 @@ export default function Home() {
       <DisasterNewsCarousel />
       {/* Hero Section */}
       <section
-        className="hero"
+        className="hero home-hero"
         style={{ minHeight: "90vh", paddingTop: 80, paddingBottom: 80 }}
       >
-        <div style={{ maxWidth: 900 }}>
+        <div className="home-hero-inner" style={{ maxWidth: 900 }}>
           <div
             className="hero-pill"
             style={{
@@ -119,6 +119,7 @@ export default function Home() {
 
           {/* CTA Cards */}
           <div
+            className="home-hero-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(280px, 1fr))",
@@ -128,6 +129,7 @@ export default function Home() {
             {/* Earthquake Card */}
             <Link to="/earthquake" style={{ textDecoration: "none" }}>
               <div
+                className="home-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -205,6 +207,7 @@ export default function Home() {
             {/* Landslide Card */}
             <Link to="/landslide" style={{ textDecoration: "none" }}>
               <div
+                className="home-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -282,6 +285,7 @@ export default function Home() {
             {/* Flood Card */}
             <Link to="/flood" style={{ textDecoration: "none" }}>
               <div
+                className="home-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -359,6 +363,7 @@ export default function Home() {
             {/* Cyclone Card */}
             <Link to="/cyclone" style={{ textDecoration: "none" }}>
               <div
+                className="home-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -437,6 +442,7 @@ export default function Home() {
           {/* disaster-roadmap Card */}
           <Link to="/disaster-vd" style={{ textDecoration: "none" }}>
   <div
+    className="home-card home-roadmap-card"
     style={{
       background: "#000",
       border: "1px solid #111",
@@ -557,8 +563,8 @@ export default function Home() {
       </section>
 
       {/* Weather Card Section */}
-      <section style={{ background: "#000", padding: "60px 20px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <section className="home-weather-section" style={{ background: "#000", padding: "60px 20px" }}>
+        <div className="home-section-inner" style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
               fontSize: "2rem",
@@ -576,6 +582,7 @@ export default function Home() {
           </h2>
 
           <div
+            className="home-weather-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
@@ -589,7 +596,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-40 dark-section">
+      <section id="features" className="py-40 dark-section home-features-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2
@@ -611,6 +618,7 @@ export default function Home() {
             {/* Earthquake Card */}
             <Link to="/earthquake" style={{ textDecoration: "none" }}>
               <div
+                className="home-card home-feature-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -729,6 +737,7 @@ export default function Home() {
             {/* Landslide Card */}
             <Link to="/landslide" style={{ textDecoration: "none" }}>
               <div
+                className="home-card home-feature-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -849,6 +858,7 @@ export default function Home() {
             {/* Cyclone Card */}
             <Link to="/cyclone" style={{ textDecoration: "none" }}>
               <div
+                className="home-card home-feature-card"
                 style={{
                   background: "#000",
                   border: "1px solid #111",
@@ -968,7 +978,7 @@ export default function Home() {
       </section>
 
       {/* Technology Section */}
-      <section className="py-40 dark-section">
+      <section className="py-40 dark-section home-tech-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2
@@ -987,6 +997,7 @@ export default function Home() {
           </div>
 
           <div
+            className="home-tech-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
@@ -995,6 +1006,7 @@ export default function Home() {
           >
             {/* Machine Learning Card */}
             <div
+              className="home-card home-tech-card"
               style={{
                 background: "#000",
                 border: "1px solid #111",
@@ -1056,6 +1068,7 @@ export default function Home() {
 
             {/* Cloud Infrastructure Card */}
             <div
+              className="home-card home-tech-card"
               style={{
                 background: "#000",
                 border: "1px solid #111",
@@ -1116,6 +1129,7 @@ export default function Home() {
 
             {/* Data Security Card */}
             <div
+              className="home-card home-tech-card"
               style={{
                 background: "#000",
                 border: "1px solid #111",

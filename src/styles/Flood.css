@@ -21,9 +21,10 @@ body, html {
 }
 
 .App, .page.flood-page {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: transparent;
   color: var(--text);
 }
@@ -46,7 +47,7 @@ header h1, .hero h1 {
 }
 
 /* Sidebar styles */
-.sidebar, .panel {
+.flood-page .sidebar, .flood-page .panel {
   background: var(--panel);
   border-right: 1px solid #1e293b;
   box-shadow: 2px 0 12px 0 rgba(16, 112, 202, 0.04);
@@ -111,9 +112,9 @@ header h1, .hero h1 {
 
 /* Responsive tweaks */
 @media (max-width: 900px) {
-  .sidebar, .panel {
-    min-width: 12rem;
-    max-width: 16rem;
+  .flood-page .sidebar, .flood-page .panel {
+    min-width: 0;
+    max-width: 100%;
   }
   .floating-panel {
     padding: 1rem 0.5rem;

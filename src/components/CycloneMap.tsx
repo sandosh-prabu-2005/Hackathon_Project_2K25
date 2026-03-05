@@ -22,6 +22,7 @@ interface MapViewUpdaterProps {
   center?: [number, number];
   zoom?: number;
   allPoints: Coordinate[];
+  compact?: boolean;
 }
 
 interface CycloneMapProps {
@@ -29,6 +30,7 @@ interface CycloneMapProps {
   predictedTrack?: Coordinate[];
   currentPosition?: Coordinate | null;
   intensity?: number | null;
+  compact?: boolean;
 }
 
 /* ---------- WIND LAYER ---------- */
@@ -77,7 +79,7 @@ L.Icon.Default.mergeOptions({
 });
 
 /* ---------- MAP VIEW UPDATER ---------- */
-function MapViewUpdater({ center, zoom, allPoints }: MapViewUpdaterProps): null {
+function MapViewUpdater({ center, zoom, allPoints, compact = false }: MapViewUpdaterProps): null {
   const map = useMap();
 
   useEffect(() => {
@@ -85,7 +87,7 @@ function MapViewUpdater({ center, zoom, allPoints }: MapViewUpdaterProps): null 
       const bounds = L.latLngBounds(
         allPoints.map((p) => [p.latitude, p.longitude])
       );
-      map.fitBounds(bounds, { padding: [50, 50] });
+      map.fitBounds(bounds, { padding: compact ? [24, 24] : [50, 50] });
     } else if (center && center[0] && center[1]) {
       map.setView(center, zoom || 5);
     } else {
@@ -93,9 +95,9 @@ function MapViewUpdater({ center, zoom, allPoints }: MapViewUpdaterProps): null 
         [8.0, 68.0],
         [35.5, 97.0],
       ]);
-      map.fitBounds(indiaBounds, { padding: [50, 50] });
+      map.fitBounds(indiaBounds, { padding: compact ? [24, 24] : [50, 50] });
     }
-  }, [center, zoom, map, allPoints]);
+  }, [center, zoom, map, allPoints, compact]);
 
   return null;
 }
@@ -106,6 +108,7 @@ export const CycloneMap: React.FC<CycloneMapProps> = ({
   predictedTrack = [],
   currentPosition = null,
   intensity = null,
+  compact = false,
 }) => {
   const mapRef = useRef<any>(null);
 
@@ -181,6 +184,7 @@ export const CycloneMap: React.FC<CycloneMapProps> = ({
           center={getMapCenter() as [number, number]}
           zoom={6}
           allPoints={allPoints}
+          compact={compact}
         />
 
         {/* Historical track */}
@@ -273,14 +277,15 @@ export const CycloneMap: React.FC<CycloneMapProps> = ({
       <div
         style={{
           position: 'absolute',
-          bottom: '20px',
-          left: '20px',
+          bottom: compact ? '12px' : '20px',
+          left: compact ? '12px' : '20px',
           backgroundColor: 'white',
-          padding: '10px',
+          padding: compact ? '8px' : '10px',
           borderRadius: '5px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
           zIndex: 1000,
-          fontSize: '12px',
+          fontSize: compact ? '11px' : '12px',
+          maxWidth: compact ? '180px' : 'none',
         }}
       >
         <div style={{ marginBottom: '5px', fontWeight: 'bold' }}>Legend</div>

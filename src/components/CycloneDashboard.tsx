@@ -35,6 +35,17 @@ export const CycloneDashboard = () => {
   
   // Wind flow modal state
   const [showWindFlow, setShowWindFlow] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1280
+  );
+  const isMobile = viewportWidth <= 1024;
+  const isSmallMobile = viewportWidth <= 640;
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Initialize wind map when modal opens
   useEffect(() => {
@@ -371,32 +382,35 @@ export const CycloneDashboard = () => {
 
   return (
     <div style={{ 
-      display: 'grid', 
+      display: 'grid',
       gridTemplateColumns: '1fr',
-      height: '100vh',
+      minHeight: '100vh',
+      height: isMobile ? 'auto' : '100vh',
       gap: 0,
       backgroundColor: '#f3f4f6',
       width: '100%',
       margin: 0,
       padding: 0,
-      overflow: 'hidden'
+      overflow: isMobile ? 'auto' : 'hidden'
     }}>
       {/* Left Panel - Input Controls (FloodWatch Dark Sidebar) */}
       <div style={{
-        position: 'fixed',
+        position: isMobile ? 'relative' : 'fixed',
         left: 0,
         top: 0,
-        width: '280px',
-        height: '100vh',
+        width: isMobile ? '100%' : '280px',
+        height: isMobile ? 'auto' : '100vh',
         backgroundColor: '#0f1419',
-        padding: '1.25rem',
+        padding: isMobile ? '1rem' : '1.25rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.25rem',
+        gap: isMobile ? '1rem' : '1.25rem',
         overflowY: 'auto',
         color: 'white',
         boxSizing: 'border-box',
-        borderRight: '1px solid #1a1f28'
+        borderRight: isMobile ? 'none' : '1px solid #1a1f28',
+        borderBottom: isMobile ? '1px solid #1a1f28' : 'none',
+        zIndex: isMobile ? 'auto' : 12
       }}>
         {/* CycloneWatch Header */}
         <div style={{
@@ -502,7 +516,7 @@ export const CycloneDashboard = () => {
            Enter Coordinates
           </label>
           
-          <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.5rem', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
             <input
               type="number"
               placeholder="Lat"
@@ -511,13 +525,14 @@ export const CycloneDashboard = () => {
               disabled={!intensityResult}
               step="0.01"
               style={{
-                width: '50px',
-                padding: '0.35rem',
+                width: isMobile ? 'calc(50% - 0.2rem)' : '50px',
+                minWidth: isMobile ? '120px' : '50px',
+                padding: isMobile ? '0.55rem' : '0.35rem',
                 borderRadius: '4px',
                 border: '1px solid #2a3038',
                 backgroundColor: intensityResult ? '#1a1f28' : '#151a22',
                 color: intensityResult ? '#ffffff' : '#6b7280',
-                fontSize: '0.65rem',
+                fontSize: isMobile ? '0.8rem' : '0.65rem',
                 cursor: intensityResult ? 'text' : 'not-allowed',
                 opacity: intensityResult ? 1 : 0.5,
                 boxSizing: 'border-box'
@@ -531,13 +546,14 @@ export const CycloneDashboard = () => {
               disabled={!intensityResult}
               step="0.01"
               style={{
-                width: '50px',
-                padding: '0.35rem',
+                width: isMobile ? 'calc(50% - 0.2rem)' : '50px',
+                minWidth: isMobile ? '120px' : '50px',
+                padding: isMobile ? '0.55rem' : '0.35rem',
                 borderRadius: '4px',
                 border: '1px solid #2a3038',
                 backgroundColor: intensityResult ? '#1a1f28' : '#151a22',
                 color: intensityResult ? '#ffffff' : '#6b7280',
-                fontSize: '0.65rem',
+                fontSize: isMobile ? '0.8rem' : '0.65rem',
                 cursor: intensityResult ? 'text' : 'not-allowed',
                 opacity: intensityResult ? 1 : 0.5,
                 boxSizing: 'border-box'
@@ -547,18 +563,19 @@ export const CycloneDashboard = () => {
               onClick={addCoordinate}
               disabled={!intensityResult}
               style={{
-                padding: '0.35rem 0.5rem',
+                padding: isMobile ? '0.6rem 0.7rem' : '0.35rem 0.5rem',
                 backgroundColor: intensityResult ? '#10b981' : '#6b7280',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: intensityResult ? 'pointer' : 'not-allowed',
                 fontWeight: '600',
-                fontSize: '0.65rem',
+                fontSize: isMobile ? '0.8rem' : '0.65rem',
                 transition: 'background 0.3s',
                 opacity: intensityResult ? 1 : 0.6,
                 whiteSpace: 'nowrap',
-                flexShrink: 0
+                flexShrink: 0,
+                width: isMobile ? '100%' : 'auto'
               }}
               onMouseEnter={(e) => {
                 if (intensityResult) (e.target as HTMLElement).style.backgroundColor = '#059669';
@@ -576,7 +593,7 @@ export const CycloneDashboard = () => {
               backgroundColor: '#1a1f28',
               padding: '0.5rem',
               borderRadius: '4px',
-              maxHeight: '110px',
+              maxHeight: isMobile ? '150px' : '110px',
               overflowY: 'auto',
               border: '1px solid #2a3038'
             }}>
@@ -764,16 +781,16 @@ export const CycloneDashboard = () => {
 
       {/* Middle Panel - Map */}
       <div style={{
-        marginLeft: '280px',
-        marginRight: '420px',
+        marginLeft: isMobile ? 0 : '280px',
+        marginRight: isMobile ? 0 : '420px',
         display: 'flex',
         flexDirection: 'column',
         gap: 0,
         position: 'relative',
         backgroundColor: '#f3f4f6',
         overflow: 'hidden',
-        height: '100vh',
-        width: 'calc(100% - 700px)'
+        height: isMobile ? '52vh' : '100vh',
+        width: isMobile ? '100%' : 'calc(100% - 700px)'
       }}>
         {/* Map Visualization - Full Height */}
         <div style={{
@@ -787,28 +804,31 @@ export const CycloneDashboard = () => {
             predictedTrack={predictedTrack}
             currentPosition={currentPosition}
             intensity={intensity}
+            compact={isMobile}
           />
         </div>
       </div>
 
       {/* Results Panel - Right Sidebar */}
       <div style={{
-        position: 'fixed',
+        position: isMobile ? 'relative' : 'fixed',
         right: 0,
         top: 0,
-        width: '420px',
-        height: '100vh',
+        width: isMobile ? '100%' : '420px',
+        height: isMobile ? 'auto' : '100vh',
         backgroundColor: '#ffffff',
-        borderLeft: '1px solid #e5e7eb',
+        borderLeft: isMobile ? 'none' : '1px solid #e5e7eb',
+        borderTop: isMobile ? '1px solid #e5e7eb' : 'none',
         overflowY: 'auto',
-        padding: '1.5rem',
+        padding: isMobile ? '1rem' : '1.5rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.25rem',
+        gap: isMobile ? '0.9rem' : '1.25rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        zIndex: isMobile ? 'auto' : 11
       }}>
-        <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#0f172a', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', letterSpacing: '-0.5px' }}>
+        <h3 style={{ margin: 0, fontSize: isMobile ? '1.05rem' : '1.25rem', color: '#0f172a', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', letterSpacing: '-0.5px' }}>
           Results
         </h3>
           
@@ -838,7 +858,7 @@ export const CycloneDashboard = () => {
                     }}></div>
                     <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0f172a', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>knots</span>
                   </div>
-                  <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#0ea5e9', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '-1px', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: isMobile ? '1.9rem' : '2.5rem', fontWeight: '800', color: '#0ea5e9', fontFamily: '"IBM Plex Mono", monospace', letterSpacing: '-1px', marginBottom: '0.5rem' }}>
                     {intensityResult?.intensity_value ? intensityResult.intensity_value.toFixed(2) : 'N/A'}
                   </div>
                 </div>
@@ -891,7 +911,9 @@ export const CycloneDashboard = () => {
                       <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        alignItems: isSmallMobile ? 'flex-start' : 'center',
+                        flexDirection: isSmallMobile ? 'column' : 'row',
+                        gap: isSmallMobile ? '0.35rem' : 0,
                         padding: '0.6rem 0.8rem',
                         backgroundColor: '#ffffff',
                         borderRadius: '6px',
@@ -907,7 +929,9 @@ export const CycloneDashboard = () => {
                       <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        alignItems: isSmallMobile ? 'flex-start' : 'center',
+                        flexDirection: isSmallMobile ? 'column' : 'row',
+                        gap: isSmallMobile ? '0.35rem' : 0,
                         padding: '0.6rem 0.8rem',
                         backgroundColor: '#ffffff',
                         borderRadius: '6px',
@@ -928,10 +952,10 @@ export const CycloneDashboard = () => {
           </>
         ) : (
           <div style={{
-            padding: '2rem 1.5rem',
+            padding: isMobile ? '1rem' : '2rem 1.5rem',
             textAlign: 'center',
             color: '#94a3b8',
-            fontSize: '0.9rem',
+            fontSize: isMobile ? '0.82rem' : '0.9rem',
             backgroundColor: '#f8fafc',
             borderRadius: '8px',
             border: '1px solid #e2e8f0',
@@ -947,19 +971,20 @@ export const CycloneDashboard = () => {
           onClick={() => setShowWindFlow(true)}
           style={{
             position: 'fixed',
-            top: '18px',
+            top: isMobile ? 'auto' : '18px',
+            bottom: isMobile ? '14px' : 'auto',
             right: '18px',
-            padding: '0.45rem 0.9rem',
+            padding: isMobile ? '0.5rem 0.75rem' : '0.45rem 0.9rem',
             backgroundColor: '#0ea5e9',
             color: 'white',
             border: 'none',
             borderRadius: '999px',
-            fontSize: '0.9rem',
+            fontSize: isMobile ? '0.78rem' : '0.9rem',
             fontWeight: '700',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: isMobile ? '0.35rem' : '0.5rem',
             boxShadow: '0 6px 18px rgba(14,165,233,0.25)',
             zIndex: 9998,
             transition: 'transform 0.12s ease'
@@ -975,7 +1000,9 @@ export const CycloneDashboard = () => {
             animation: 'blink 1s infinite',
             boxShadow: '0 0 6px #ff0000'
           }}></span>
-          <span style={{ animation: 'blink 1s infinite', display: 'inline-block' }}>  Live Wind Flow</span>
+          <span style={{ animation: 'blink 1s infinite', display: 'inline-block' }}>
+            {isMobile ? 'Wind' : 'Live Wind Flow'}
+          </span>
         </button>
 
           <style>{`
@@ -1010,12 +1037,12 @@ export const CycloneDashboard = () => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '85%',
-            height: '85%',
+            width: isMobile ? '96%' : '85%',
+            height: isMobile ? '88%' : '85%',
             maxWidth: '1280px',
             backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '2rem',
+            borderRadius: isMobile ? '10px' : '16px',
+            padding: isMobile ? '0.85rem' : '2rem',
             boxShadow: '0 25px 50px rgba(0, 0, 0, 0.4)',
             display: 'flex',
             flexDirection: 'column',
@@ -1025,14 +1052,16 @@ export const CycloneDashboard = () => {
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '0.6rem' : 0,
               marginBottom: '1rem',
-              paddingBottom: '1rem',
+              paddingBottom: isMobile ? '0.6rem' : '1rem',
               borderBottom: '2px solid #f1f5f9'
             }}>
               <h2 style={{
                 margin: 0,
-                fontSize: '1.3rem',
+                fontSize: isMobile ? '1rem' : '1.3rem',
                 color: '#0f172a',
                 fontWeight: '800',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
@@ -1046,8 +1075,8 @@ export const CycloneDashboard = () => {
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.9rem',
+                  padding: isMobile ? '0.45rem 0.8rem' : '0.5rem 1rem',
+                  fontSize: isMobile ? '0.8rem' : '0.9rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
@@ -1063,7 +1092,7 @@ export const CycloneDashboard = () => {
                 flex: 1,
                 width: '100%',
                 height: '100%',
-                borderRadius: '8px',
+                borderRadius: isMobile ? '6px' : '8px',
                 overflow: 'hidden',
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#f8fafc'

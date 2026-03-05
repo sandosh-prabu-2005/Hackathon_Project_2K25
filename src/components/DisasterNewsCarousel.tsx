@@ -14,6 +14,13 @@ export default function DisasterNewsCarousel() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 640);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -54,33 +61,35 @@ export default function DisasterNewsCarousel() {
       href={currentNews.url}
       target="_blank"
       rel="noreferrer"
-      style={styles.ticker}
+      style={{ ...styles.ticker, padding: isMobile ? '10px 12px' : '12px 20px' }}
     >
-      <div style={styles.tickerContent}>
-        <div style={styles.label}>
+      <div style={{ ...styles.tickerContent, gap: isMobile ? 8 : 16 }}>
+        <div style={{ ...styles.label, padding: isMobile ? '3px 8px' : '4px 12px', fontSize: isMobile ? '0.65rem' : '0.75rem' }}>
           <Warning sx={{ fontSize: 18, color: "#ef4444" }} />
           <span>LATEST NEWS</span>
         </div>
 
         <div style={styles.newsWrapper}>
           <div style={styles.newsText}>
-            <span style={styles.newsTitle}>{currentNews.title}</span>
-            <span style={styles.newsSeparator}>•</span>
-            <span style={styles.newsSource}>{currentNews.source.name}</span>
+            <span style={{ ...styles.newsTitle, fontSize: isMobile ? '0.78rem' : '0.875rem' }}>{currentNews.title}</span>
+            {!isMobile && <span style={styles.newsSeparator}>•</span>}
+            {!isMobile && <span style={styles.newsSource}>{currentNews.source.name}</span>}
           </div>
         </div>
 
-        <div style={styles.indicator}>
-          {news.map((_, index) => (
-            <div
-              key={index}
-              style={{
-                ...styles.dot,
-                background: index === currentIndex ? "#ef4444" : "rgba(239,68,68,0.3)",
-              }}
-            />
-          ))}
-        </div>
+        {!isMobile && (
+          <div style={styles.indicator}>
+            {news.map((_, index) => (
+              <div
+                key={index}
+                style={{
+                  ...styles.dot,
+                  background: index === currentIndex ? "#ef4444" : "rgba(239,68,68,0.3)",
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Animated scrolling text effect */}
