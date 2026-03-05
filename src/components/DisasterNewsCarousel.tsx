@@ -9,7 +9,7 @@ type NewsArticle = {
   publishedAt: string;
 };
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000';
+const API_BASE = import.meta.env.VITE_API_BASE || '/backend';
 
 export default function DisasterNewsCarousel() {
   const [news, setNews] = useState<NewsArticle[]>([]);

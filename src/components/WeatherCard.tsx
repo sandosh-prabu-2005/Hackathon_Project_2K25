@@ -6,7 +6,7 @@ import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 type WeatherData = any;
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000';
+const API_BASE = import.meta.env.VITE_API_BASE || '/backend';
 
 export default function WeatherCard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);

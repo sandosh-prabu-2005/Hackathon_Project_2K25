@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { Link } from 'react-router-dom'
 import '../styles/landslide.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000'
+const API_BASE = import.meta.env.VITE_API_BASE || '/backend'
 
 function Earthquake() {
   const [latitude, setLatitude] = useState('')

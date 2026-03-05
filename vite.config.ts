@@ -11,6 +11,15 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      '/backend': {
+        target: 'http://65.2.10.221:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/backend/, ''),
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
