@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000';
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -87,7 +87,7 @@ export const chatApi = {
   // Chat with DISA-Buddy disaster assistant
   sendMessage: async (message) => {
     try {
-      const response = await fetch('http://localhost:4000/api/chat', {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export const chatApi = {
   // Health check for chat server
   health: async () => {
     try {
-      const response = await fetch('http://localhost:4000/health');
+      const response = await fetch(`${API_BASE}/health`);
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
       }

@@ -8,6 +8,8 @@ type NewsArticle = {
   source: { name: string };
 };
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000';
+
 export default function WeatherDashboard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [news, setNews] = useState<NewsArticle[]>([]);
@@ -21,12 +23,12 @@ export default function WeatherDashboard() {
     try {
       setLoading(true);
       const weatherRes = await fetch(
-        `http://localhost:8080/api/weather?lat=${latitude}&lon=${longitude}`
+        `${API_BASE}/api/weather?lat=${latitude}&lon=${longitude}`
       );
       const weatherData = await weatherRes.json();
       setWeather(weatherData);
 
-      const newsRes = await fetch(`http://localhost:8080/api/news`);
+      const newsRes = await fetch(`${API_BASE}/api/news`);
       const newsData = await newsRes.json();
       setNews(newsData.articles || []);
     } catch (err) {

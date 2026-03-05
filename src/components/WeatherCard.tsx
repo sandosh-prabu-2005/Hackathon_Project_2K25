@@ -6,6 +6,8 @@ import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 type WeatherData = any;
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000';
+
 export default function WeatherCard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [location, setLocation] = useState<{ lat: number; lon: number; name: string } | null>(null);
@@ -29,7 +31,7 @@ export default function WeatherCard() {
     try {
       setLoading(true);
       const weatherRes = await fetch(
-        `http://localhost:8080/api/weather?lat=${latitude}&lon=${longitude}`
+        `${API_BASE}/api/weather?lat=${latitude}&lon=${longitude}`
       );
       const weatherData = await weatherRes.json();
       setWeather(weatherData);

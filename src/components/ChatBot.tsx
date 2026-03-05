@@ -9,6 +9,8 @@ interface Message {
   timestamp: Date
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000'
+
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
@@ -49,7 +51,7 @@ export default function ChatBot() {
 
     try {
       // Call the merged chatbot endpoint
-      const response = await fetch('http://localhost:8080/chat', {
+      const response = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +79,7 @@ export default function ChatBot() {
       console.error('Chat error:', error)
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
-        text: "Connection error. Make sure the API server is running on port 8080. Emergency: 112",
+        text: "Connection error. Make sure the API server is reachable. Emergency: 112",
         sender: 'bot',
         timestamp: new Date()
       }

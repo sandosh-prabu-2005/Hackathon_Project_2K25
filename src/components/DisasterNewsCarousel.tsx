@@ -9,6 +9,8 @@ type NewsArticle = {
   publishedAt: string;
 };
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000';
+
 export default function DisasterNewsCarousel() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ export default function DisasterNewsCarousel() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const newsRes = await fetch(`http://localhost:8080/api/news`);
+        const newsRes = await fetch(`${API_BASE}/api/news`);
         const newsData = await newsRes.json();
         setNews(newsData.articles?.slice(0, 10) || []);
       } catch (err) {

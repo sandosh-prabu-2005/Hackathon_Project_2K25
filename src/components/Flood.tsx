@@ -6,7 +6,7 @@ import MapView from './MapView'
 import PredictionPanel from './PredictionPanel'
 import type { Station, PredictionResult, StationInfo } from '../types'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080'
+const BACKEND_URL = import.meta.env.VITE_API_BASE || import.meta.env.VITE_BACKEND_URL || 'http://65.2.10.221:8000'
 const API = `${BACKEND_URL}/flood`
 
 function Flood() {

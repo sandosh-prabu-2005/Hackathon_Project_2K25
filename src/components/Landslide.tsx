@@ -2,6 +2,8 @@ import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/landslide.css'
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000'
+
 function Landslide() {
   const [file, setFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState('Choose .h5 file')
@@ -42,7 +44,7 @@ function Landslide() {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await fetch('http://localhost:8080/predict_all', {
+      const response = await fetch(`${API_BASE}/predict_all`, {
         method: 'POST',
         body: formData
       })

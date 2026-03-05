@@ -4,6 +4,8 @@ import 'leaflet/dist/leaflet.css'
 import { Link } from 'react-router-dom'
 import '../styles/landslide.css'
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://65.2.10.221:8000'
+
 function Earthquake() {
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
@@ -91,7 +93,7 @@ function Earthquake() {
     setResult('')
 
     try {
-      const response = await fetch('http://localhost:8080/earthquake/predict', {
+      const response = await fetch(`${API_BASE}/earthquake/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ latitude: lat, longitude: lng, depth: dep, year: yr, month: mnth })
