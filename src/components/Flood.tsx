@@ -153,12 +153,14 @@ function Flood() {
           style={{
             flex: 1,
             minHeight: isMobile ? 360 : 620,
+            height: isMobile ? 360 : undefined,
             borderRadius: 12,
             overflow: 'hidden',
             background: '#181f2e'
           }}
         >
           <MapView
+            key={isMobile ? 'mobile-map' : 'desktop-map'}
             stations={stations}
             predictionResult={predictionResult}
             onStationClick={(station) => {

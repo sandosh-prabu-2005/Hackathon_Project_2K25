@@ -66,6 +66,12 @@ header h1, .hero h1 {
   box-shadow: none;
 }
 
+.leaflet-container img,
+.leaflet-container .leaflet-tile {
+  max-width: none !important;
+  border-radius: 0 !important;
+}
+
 .leaflet-popup-content-wrapper {
   border-radius: 10px;
   box-shadow: 0 8px 24px 0 rgba(16, 112, 202, 0.10);
