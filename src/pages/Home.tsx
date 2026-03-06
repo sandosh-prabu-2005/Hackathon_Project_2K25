@@ -35,13 +35,13 @@ export default function Home() {
               <i className="fas fa-shield-alt"></i>
             </div>
             <div className="brand-info">
-              <h1>Aithon</h1>
+              <h1>AWS Ai For Bharat</h1>
               <p>Disaster Intelligence Platform</p>
             </div>
           </div>
           <nav className="nav-links">
             <a href="#features">Features</a>
-            <a href="#about">About</a>
+            <a href="/about">About</a>
             <a href="#contact">Contact</a>
           </nav>
         </div>
@@ -1216,7 +1216,7 @@ export default function Home() {
                 <div className="brand-badge">
                   <i className="fas fa-shield-alt"></i>
                 </div>
-                <span className="brand-name">Aithon</span>
+                <span className="brand-name">AWS Ai For Bharat</span>
               </div>
               <p className="footer-desc">
                 Leading provider of AI-powered disaster intelligence solutions
@@ -1319,7 +1319,7 @@ export default function Home() {
           <div className="footer-bottom border-t">
             <div className="footer-bottom-inner">
               <p className="copyright">
-                © 2026 Aithon Disaster Intelligence. All rights reserved.
+                © 2026 AWS Ai For Bharat Disaster Intelligence. All rights reserved.
               </p>
               <div className="footer-links">
                 <a href="#">Terms of Service</a>
