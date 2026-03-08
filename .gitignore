@@ -1,0 +1,56 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+dist/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Git artifacts
+**/.git/
+
+# Backend heavy/duplicate/training artifacts
+Backend/Backend/
+Backend/archive/
+Backend/predictions/
+Backend/training/
+Backend/models/New folder/
+Backend/ResNet18.ipynb
+Backend/*.png
+Backend/1.png
+Backend/2.png
+Backend/Input/
+
+# Backend non-runtime model artifacts (keep only runtime ones)
+Backend/model_save.h5
+Backend/best_model.h5
+Backend/final_model.keras
+
+# Frontend build artifacts
+Hackathon_Project_2K25-1/dist/

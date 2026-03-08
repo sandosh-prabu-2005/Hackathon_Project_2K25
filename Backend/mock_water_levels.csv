@@ -1,0 +1,11 @@
+station_name,state,district,basin,river,latitude,longitude,water_level_4,water_level_3,water_level_2,water_level_1,warning_level,danger_level,hfl_level
+Bhavani River at Nilgiris,Tamil Nadu,Nilgiris,Cauvery,Bhavani,11.3742,76.9922,130.3,130.4,130.45,130.5,131.5,132.5,134.76
+Periyaodai River at Cuddalore,Tamil Nadu,Cuddalore,East flowing rivers between Pennar and Kanyakumari,Periyaodai,11.4431,79.0244,45.2,45.8,46.1,46.5,50.0,52.0,55.0
+Amaravathi River at Karur,Tamil Nadu,Karur,Cauvery,Amaravathi,10.8808,77.9847,25.1,25.3,25.7,26.2,30.0,32.0,35.0
+Kaveri River at Tiruchirappalli,Tamil Nadu,Tiruchirappalli,Cauvery,Kaveri,10.7905,78.7047,75.2,75.8,76.1,76.5,80.0,82.0,85.0
+Vaigai River at Madurai,Tamil Nadu,Madurai,Southern Rivers,Vaigai,9.9252,78.1198,15.2,15.8,16.1,16.5,20.0,22.0,25.0
+Thamirabarani River at Tirunelveli,Tamil Nadu,Tirunelveli,Southern Rivers,Thamirabarani,8.7139,77.7567,5.2,5.8,6.1,6.5,10.0,12.0,15.0
+Palghat River at Palakkad,Kerala,Palakkad,Cauvery,Palghat,10.7867,76.6548,85.2,85.8,86.1,86.5,90.0,92.0,95.0
+Chaliyar River at Kozhikode,Kerala,Kozhikode,Western Ghats,Chaliyar,11.2588,75.7804,12.2,12.8,13.1,13.5,17.0,19.0,22.0
+Pamba River at Pathanamthitta,Kerala,Pathanamthitta,Western Ghats,Pamba,9.2648,76.7870,8.2,8.8,9.1,9.5,13.0,15.0,18.0
+Periyar River at Ernakulam,Kerala,Ernakulam,Western Ghats,Periyar,9.9816,76.2999,22.2,22.8,23.1,23.5,27.0,29.0,32.0
