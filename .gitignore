@@ -1,8 +1,27 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Git artifacts
+**/.git/
+
 # OS / editor
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Python
 __pycache__/
@@ -18,6 +37,8 @@ env/
 # Node
 node_modules/
 dist/
+dist-ssr
+*.local
 
 # Secrets
 .env
@@ -25,15 +46,6 @@ dist/
 !.env.example
 *.pem
 *.key
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Git artifacts
-**/.git/
 
 # Backend heavy/duplicate/training artifacts
 Backend/Backend/
