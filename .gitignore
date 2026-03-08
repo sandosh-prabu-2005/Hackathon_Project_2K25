@@ -7,62 +7,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Git artifacts
-**/.git/
+node_modules
+dist
+dist-ssr
+*.local
 
-# OS / editor
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+.idea
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.venv/
-venv/
-env/
-.pytest_cache/
-.mypy_cache/
-
-# Node
-node_modules/
-dist/
-dist-ssr
-*.local
-
-# Secrets
 .env
 .env.*
 !.env.example
-*.pem
-*.key
 
-# Backend heavy/duplicate/training artifacts
-Backend/Backend/
-Backend/archive/
-Backend/predictions/
-Backend/training/
-Backend/models/New folder/
-Backend/ResNet18.ipynb
-Backend/*.png
-Backend/1.png
-Backend/2.png
-Backend/Input/
-
-# Backend non-runtime model artifacts (keep only runtime ones)
-Backend/model_save.h5
-Backend/best_model.h5
-Backend/final_model.keras
-
-# Frontend build artifacts
-Hackathon_Project_2K25-1/dist/
+Hackathon_Project_2K25-1/

@@ -9,9 +9,9 @@
     --success: #10b981;
 }
 
-* { box-sizing: border-box; }
+.page, .page * { box-sizing: border-box; }
 
-body {
+.page {
     margin: 0;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     background: radial-gradient(1200px 600px at 10% -10%, #1f2a44 0, transparent 60%),
@@ -21,7 +21,7 @@ body {
 }
 
 /* Prevent horizontal overflow and keep vertical scrolling normal */
-html, body { overflow-x: hidden; }
+.page { overflow-x: hidden; }
 
 .page {
     max-width: 100%;
@@ -55,7 +55,7 @@ html, body { overflow-x: hidden; }
     text-transform: uppercase;
 }
 
-h1 {
+.page h1 {
     margin: 0 0 6px;
     font-size: 22px;
     line-height: 1.1;
@@ -168,7 +168,7 @@ button.primary:hover { filter: brightness(1.05); }
     font-weight: 700;
 }
 
-.grid {
+.page .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 12px;
@@ -216,7 +216,7 @@ button.primary:hover { filter: brightness(1.05); }
     border: 1px dashed rgba(148,163,184,0.12);
 }
 
-img {
+.page img {
     max-width: 100%;
     width: 100%;
     height: auto;
@@ -280,7 +280,7 @@ img {
 }
 
 /* Global heading colors for visibility */
-h1, h2, h3 {
+.page h1, .page h2, .page h3 {
     color: var(--text);
 }
 

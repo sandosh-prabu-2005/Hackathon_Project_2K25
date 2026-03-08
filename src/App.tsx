@@ -7,13 +7,13 @@ import DisasterRoadmapScreen from './components/VirtualDrillPrompt';
 import VduGame from './components/Vdu1Player';
 import VduGame2 from './components/Vdu2Player';
 import Home from './pages/Home';
+import CrowdReportsPage from './crowd/CrowdReportsPage';
 import './styles/app.css'
-import About from './pages/About'
 
-// function AboutRedirect() {
-//   window.location.href = "https://awsaihackathon.vercel.app/";
-//   return null;
-// }
+function AboutRedirect() {
+  window.location.href = "https://awsaihackathon.vercel.app/";
+  return null;
+}
 
 function App() {
   return (
@@ -27,9 +27,8 @@ function App() {
         <Route path="/disaster-vd" element={<DisasterRoadmapScreen />} />
         <Route path="/drill" element={<VduGame />} />
         <Route path="/game" element={<VduGame2 />} />
-        {/* <Route path="/about" element={<AboutRedirect />} /> */}
-        <Route path="/about" element={<About />} />
-
+        <Route path="/crowd-reports" element={<CrowdReportsPage />} />
+        <Route path="/about" element={<AboutRedirect />} />
       </Routes>
     </Router>
   )

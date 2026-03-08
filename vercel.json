@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/backend/:path*",
-      "destination": "http://65.2.10.221:8000/:path*"
+      "destination": "https://w62srqa987.execute-api.us-east-1.amazonaws.com/prod-deploy-backend/:path*"
     },
     {
       "source": "/(.*)",

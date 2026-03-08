@@ -6,6 +6,7 @@ import MapView from './MapView'
 import PredictionPanel from './PredictionPanel'
 import type { Station, PredictionResult, StationInfo } from '../types'
 import { API_BASE as BACKEND_URL } from '../config/apiBase'
+import { getBackendCapabilities } from '../config/backendCapabilities'
 const API = `${BACKEND_URL}/flood`
 
 function Flood() {
@@ -16,6 +17,7 @@ function Flood() {
   const [selectedStation, setSelectedStation] = useState<StationInfo | null>(null)
   const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const [serviceMessage, setServiceMessage] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 1024)
 
   /* ===============================
@@ -36,11 +38,24 @@ function Flood() {
 
   const fetchStations = async () => {
     try {
+      const capabilities = await getBackendCapabilities()
+      if (!capabilities.hasFlood) {
+        setServiceMessage('Flood service is not available on the currently running backend. Start the unified backend (merged_app.py) to enable flood routes.')
+        setStations([])
+        return
+      }
+
       const response = await axios.get(`${API}/stations`)
       setStations(response.data.stations)
+      setServiceMessage(null)
     } catch (error) {
-      console.error('Failed to fetch stations:', error)
-      alert('Failed to load station data')
+      const axiosError = error as AxiosError<{ detail?: string }>
+      const statusCode = axiosError.response?.status
+      if (statusCode === 404) {
+        setServiceMessage('Flood routes returned 404. The current backend instance does not expose /flood/* endpoints.')
+      } else {
+        setServiceMessage('Failed to load station data from backend.')
+      }
     }
   }
 
@@ -208,6 +223,21 @@ function Flood() {
             >
               Station Information
             </h3>
+            {serviceMessage && (
+              <div
+                style={{
+                  marginBottom: 12,
+                  padding: 10,
+                  borderRadius: 8,
+                  background: 'rgba(220,38,38,0.15)',
+                  border: '1px solid rgba(248,113,113,0.4)',
+                  color: '#fecaca',
+                  fontSize: 13
+                }}
+              >
+                {serviceMessage}
+              </div>
+            )}
             <button
               onClick={useMyLocation}
               style={{ width: '100%', marginBottom: 12, padding: '10px 12px', borderRadius: 8, background: 'linear-gradient(90deg,#06b6d4,#0ea5e9)', color: '#fff', border: 'none', cursor: 'pointer' }}

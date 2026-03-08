@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/backend': {
-        target: 'http://65.2.10.221:8000',
+        target: 'https://w62srqa987.execute-api.us-east-1.amazonaws.com/prod-deploy-backend',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/backend/, ''),
       },

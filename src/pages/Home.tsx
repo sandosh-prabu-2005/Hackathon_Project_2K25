@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   GpsFixed,
@@ -23,10 +24,340 @@ import Weather from "../components/WeatherDashboard";
 import WeatherCard from "../components/WeatherCard";
 import NewsCard from "../components/NewsCard";
 import DisasterNewsCarousel from "../components/DisasterNewsCarousel";
+import { listCrowdReports } from "../crowd/api/crowdReportsApi";
+import type { CrowdReport } from "../crowd/types/crowd";
+import { API_BASE, CROWD_API_BASE } from "../config/apiBase";
+import { getBackendCapabilities } from "../config/backendCapabilities";
+
+const HOME_ALERT_RADIUS_KM = 2;
+const HOME_ALERT_POLL_MS = 15000;
+const HOME_ALERT_LOOKBACK_HOURS = 1;
+const HOME_ALERT_WS_RECONNECT_MS = 5000;
+
+type HomeAlert = {
+  id: string;
+  title: string;
+  message: string;
+};
+
+type FloodStation = {
+  station_name: string;
+  state: string;
+  district: string;
+  basin: string;
+  river: string;
+  latitude: number;
+  longitude: number;
+};
+
+type LandingAiSafety = {
+  overallSafePercentage: number;
+  lastUpdated: string;
+  rainfall7DayTotal: number | null;
+  floodSafePercentage: number;
+  floodSignal: string;
+  floodNote: string;
+};
+
+function calcDistanceKm(
+  from: { latitude: number; longitude: number },
+  to: { latitude: number; longitude: number }
+): number {
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const dLat = toRadians(to.latitude - from.latitude);
+  const dLon = toRadians(to.longitude - from.longitude);
+  const lat1 = toRadians(from.latitude);
+  const lat2 = toRadians(to.latitude);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  return earthRadiusKm * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
 
 export default function Home() {
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [alerts, setAlerts] = useState<HomeAlert[]>([]);
+  const [wsDisabled, setWsDisabled] = useState(false);
+  const [crowdRoutesAvailable, setCrowdRoutesAvailable] = useState(false);
+  const [aiSafety, setAiSafety] = useState<LandingAiSafety | null>(null);
+  const [aiSafetyLoading, setAiSafetyLoading] = useState(false);
+  const [aiSafetyError, setAiSafetyError] = useState<string | null>(null);
+  const shownAlertIdsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const capabilities = await getBackendCapabilities();
+      if (cancelled) return;
+      setCrowdRoutesAvailable(capabilities.hasCrowdReports);
+      if (!capabilities.hasCrowdReports || !capabilities.hasCrowdReportsWs) {
+        setWsDisabled(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      () => {
+        setUserLocation(null);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  const checkNearbyAlerts = useCallback(async () => {
+    if (!crowdRoutesAvailable) return;
+    if (!userLocation) return;
+
+    const latDelta = HOME_ALERT_RADIUS_KM / 111.32;
+    const lonDelta =
+      HOME_ALERT_RADIUS_KM / (111.32 * Math.max(0.1, Math.cos((userLocation.latitude * Math.PI) / 180)));
+    const result = await listCrowdReports({
+      limit: 100,
+      offset: 0,
+      min_lat: userLocation.latitude - latDelta,
+      max_lat: userLocation.latitude + latDelta,
+      min_lon: userLocation.longitude - lonDelta,
+      max_lon: userLocation.longitude + lonDelta
+    });
+
+    const now = Date.now();
+    const lookbackMs = HOME_ALERT_LOOKBACK_HOURS * 60 * 60 * 1000;
+    const nearby = result.items
+      .filter((item) => {
+        const distance = calcDistanceKm(userLocation, { latitude: item.latitude, longitude: item.longitude });
+        const severityMatch = item.severity !== "low";
+        const statusMatch = item.status !== "rejected";
+        const createdAtMs = parseReportTimestampMs(item.created_at, now);
+        const recent = createdAtMs !== null && now - createdAtMs <= lookbackMs;
+        return distance <= HOME_ALERT_RADIUS_KM && severityMatch && statusMatch && recent;
+      })
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 2);
+
+    const newAlerts: HomeAlert[] = nearby
+      .filter((item) => !shownAlertIdsRef.current.has(item.id))
+      .map((item) => buildHomeAlert(item, userLocation));
+
+    if (newAlerts.length > 0) {
+      newAlerts.forEach((alert) => shownAlertIdsRef.current.add(alert.id));
+      setAlerts((prev) => [...newAlerts, ...prev].slice(0, 3));
+      window.setTimeout(() => {
+        setAlerts((prev) => prev.filter((entry) => !newAlerts.some((n) => n.id === entry.id)));
+      }, 10000);
+    }
+  }, [crowdRoutesAvailable, userLocation]);
+
+  useEffect(() => {
+    if (!crowdRoutesAvailable) return;
+    if (!userLocation) return;
+
+    let cancelled = false;
+    const run = async () => {
+      try {
+        await checkNearbyAlerts();
+      } catch {
+        // Home page should remain silent on polling failures.
+      }
+    };
+
+    void run();
+    const interval = window.setInterval(() => {
+      if (!cancelled) void run();
+    }, HOME_ALERT_POLL_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [crowdRoutesAvailable, userLocation, checkNearbyAlerts]);
+
+  useEffect(() => {
+    if (!crowdRoutesAvailable) return;
+    if (!userLocation || wsDisabled) return;
+
+    let socket: WebSocket | null = null;
+    let reconnectTimer: number | null = null;
+    let cancelled = false;
+    let openedOnce = false;
+
+    const connect = () => {
+      if (cancelled) return;
+      try {
+        socket = new WebSocket(buildCrowdWsUrl(CROWD_API_BASE, "/api/crowd-reports/ws"));
+      } catch {
+        reconnectTimer = window.setTimeout(connect, HOME_ALERT_WS_RECONNECT_MS);
+        return;
+      }
+
+      socket.onopen = () => {
+        openedOnce = true;
+      };
+
+      socket.onmessage = () => {
+        void checkNearbyAlerts().catch(() => undefined);
+      };
+
+      socket.onclose = () => {
+        if (!openedOnce) {
+          setWsDisabled(true);
+          return;
+        }
+        if (!cancelled) reconnectTimer = window.setTimeout(connect, HOME_ALERT_WS_RECONNECT_MS);
+      };
+
+      socket.onerror = () => {
+        // Keep silent; polling fallback remains active.
+      };
+    };
+
+    connect();
+    return () => {
+      cancelled = true;
+      if (reconnectTimer !== null) window.clearTimeout(reconnectTimer);
+      if (socket && socket.readyState === WebSocket.OPEN) socket.close();
+    };
+  }, [crowdRoutesAvailable, userLocation, wsDisabled, checkNearbyAlerts]);
+
+  const fetchAiSafety = useCallback(async () => {
+    if (!userLocation) return;
+
+    setAiSafetyLoading(true);
+    setAiSafetyError(null);
+
+    let floodSafe = 60;
+    let floodSignal = "Monitoring";
+    let floodNote = "Flood model data is loading.";
+    let rainfall7DayTotal: number | null = null;
+    const capabilities = await getBackendCapabilities();
+
+    if (capabilities.hasFlood) {
+      try {
+        const stationRes = await fetch(`${API_BASE}/flood/stations`);
+        const stationData = (await stationRes.json().catch(() => ({}))) as { stations?: FloodStation[] };
+        const stations = Array.isArray(stationData.stations) ? stationData.stations : [];
+
+        if (stationRes.ok && stations.length > 0) {
+          let nearest = stations[0];
+          let nearestDist = calcDistanceKm(userLocation, {
+            latitude: nearest.latitude,
+            longitude: nearest.longitude
+          });
+
+          for (const station of stations) {
+            const dist = calcDistanceKm(userLocation, { latitude: station.latitude, longitude: station.longitude });
+            if (dist < nearestDist) {
+              nearest = station;
+              nearestDist = dist;
+            }
+          }
+
+          const floodRes = await fetch(`${API_BASE}/flood/predict`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: nearest.station_name,
+              latitude: nearest.latitude,
+              longitude: nearest.longitude,
+              state: nearest.state,
+              district: nearest.district,
+              basin: nearest.basin,
+              river: nearest.river
+            })
+          });
+
+          const floodData = (await floodRes.json().catch(() => ({}))) as {
+            status?: string;
+            probability?: number;
+            rainfall_data?: number[];
+            station_info?: { name?: string };
+            detail?: string;
+          };
+
+          if (floodRes.ok) {
+            const status = String(floodData.status ?? "Unknown");
+            const probability = Number(floodData.probability ?? 0.5);
+            const rain = Array.isArray(floodData.rainfall_data) ? floodData.rainfall_data : [];
+            rainfall7DayTotal = rain.length > 0 ? Number(rain.reduce((acc, value) => acc + Number(value || 0), 0).toFixed(1)) : null;
+
+            if (status.toLowerCase().includes("safe")) {
+              floodSafe = clampScore(90 - probability * 40);
+              floodSignal = "Low";
+            } else if (status.toLowerCase().includes("warning")) {
+              floodSafe = clampScore(60 - probability * 25);
+              floodSignal = "Moderate";
+            } else if (status.toLowerCase().includes("danger")) {
+              floodSafe = clampScore(30 - probability * 15);
+              floodSignal = "High";
+            } else {
+              floodSafe = clampScore(55 - probability * 20);
+              floodSignal = "Unknown";
+            }
+
+            floodNote = `${status} at ${floodData.station_info?.name ?? nearest.station_name}.`;
+          } else {
+            floodNote = String(floodData.detail ?? "Flood response unavailable.");
+          }
+        } else {
+          floodNote = "Could not load flood station list.";
+        }
+      } catch {
+        floodNote = "Could not reach flood endpoints.";
+      }
+    } else {
+      floodSignal = "Unavailable";
+      floodSafe = 50;
+      floodNote = "Flood routes are not exposed by the running backend instance.";
+    }
+
+    const overallSafePercentage = clampScore(floodSafe);
+
+    setAiSafety({
+      overallSafePercentage,
+      lastUpdated: new Date().toLocaleTimeString(),
+      rainfall7DayTotal,
+      floodSafePercentage: floodSafe,
+      floodSignal,
+      floodNote
+    });
+    setAiSafetyError(null);
+    setAiSafetyLoading(false);
+  }, [userLocation]);
+
+  useEffect(() => {
+    if (!userLocation) return;
+    void fetchAiSafety();
+  }, [userLocation, fetchAiSafety]);
+
   return (
     <div className="container site home-root" style={{ background: "#000" }}>
+      {alerts.length > 0 && (
+        <div className="fixed right-4 top-24 z-[9999] flex w-[min(92vw,380px)] flex-col gap-2">
+          {alerts.map((alert) => (
+            <div
+              key={alert.id}
+              className="rounded-xl border border-amber-200 bg-amber-50/95 p-3 shadow-lg backdrop-blur"
+              role="status"
+            >
+              <p className="text-sm font-semibold text-amber-900">{alert.title}</p>
+              <p className="mt-1 text-xs text-amber-800">{alert.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Professional Header */}
       <header className="home-header" style={{ background: "#000" }}>
         <div className="header-inner">
@@ -41,6 +372,7 @@ export default function Home() {
           </div>
           <nav className="nav-links">
             <a href="#features">Features</a>
+            <Link to="/crowd-reports">Crowd Reports</Link>
             <a href="/about">About</a>
             <a href="#contact">Contact</a>
           </nav>
@@ -48,6 +380,96 @@ export default function Home() {
       </header>
       <Weather />
       <DisasterNewsCarousel />
+      <section style={{ padding: "28px 20px 8px", background: "#000" }}>
+        <div
+          style={{
+            maxWidth: 1100,
+            margin: "0 auto",
+            borderRadius: 18,
+            border: "1px solid rgba(59,130,246,0.35)",
+            background: "linear-gradient(135deg, rgba(2,6,23,0.98), rgba(15,23,42,0.95))",
+            boxShadow: "0 24px 50px rgba(2,6,23,0.45)",
+            padding: "22px 20px"
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+            <div>
+              <h2 style={{ margin: 0, color: "#dbeafe", fontSize: "1.55rem", fontWeight: 700 }}>AI Safety Index</h2>
+              <p style={{ margin: "6px 0 0", color: "#93c5fd", fontSize: 13 }}>
+                Computed from live Flood prediction model endpoint.
+              </p>
+              <p style={{ margin: "6px 0 0", color: "#93c5fd", fontSize: 12, lineHeight: 1.5 }}>
+                With real-time satellite image feeds, we can estimate landslide and cyclone safety percentages too.
+                Earthquake cannot be reliably predicted in real time.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void fetchAiSafety()}
+              disabled={!userLocation || aiSafetyLoading}
+              style={{
+                border: "1px solid rgba(125,211,252,0.45)",
+                background: aiSafetyLoading ? "rgba(30,41,59,0.8)" : "rgba(14,116,144,0.3)",
+                color: "#e0f2fe",
+                borderRadius: 10,
+                padding: "8px 14px",
+                cursor: !userLocation || aiSafetyLoading ? "not-allowed" : "pointer",
+                fontWeight: 600
+              }}
+            >
+              {aiSafetyLoading ? "Refreshing..." : "Refresh AI Score"}
+            </button>
+          </div>
+
+          {!userLocation && (
+            <p style={{ marginTop: 12, color: "#fca5a5", fontSize: 13 }}>
+              Enable location to calculate your local safety percentage.
+            </p>
+          )}
+
+          {userLocation && aiSafety && (
+            <>
+              <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "minmax(180px,220px) 1fr", gap: 14 }}>
+                <div
+                  style={{
+                    borderRadius: 14,
+                    border: "1px solid rgba(59,130,246,0.35)",
+                    background: "rgba(15,23,42,0.8)",
+                    padding: 14
+                  }}
+                >
+                  <p style={{ margin: 0, color: "#93c5fd", fontSize: 12 }}>Overall Safe</p>
+                  <p style={{ margin: "6px 0 0", color: "#ecfeff", fontSize: 34, fontWeight: 800 }}>
+                    {aiSafety.overallSafePercentage}%
+                  </p>
+                  <p style={{ margin: "8px 0 0", color: "#7dd3fc", fontSize: 12 }}>
+                    Updated: {aiSafety.lastUpdated}
+                  </p>
+                  <p style={{ margin: "5px 0 0", color: "#7dd3fc", fontSize: 12 }}>
+                    Rainfall (7d): {aiSafety.rainfall7DayTotal === null ? "N/A" : `${aiSafety.rainfall7DayTotal} mm`}
+                  </p>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
+                  <div
+                    style={{
+                      borderRadius: 12,
+                      border: "1px solid rgba(59,130,246,0.25)",
+                      background: "rgba(15,23,42,0.65)",
+                      padding: "12px 13px"
+                    }}
+                  >
+                    <p style={{ margin: 0, color: "#bfdbfe", fontWeight: 700, fontSize: 14 }}>Flood Final Result</p>
+                    <p style={{ margin: "7px 0 0", color: "#e0f2fe", fontSize: 27, fontWeight: 800 }}>{aiSafety.floodSafePercentage}%</p>
+                    <p style={{ margin: "5px 0 0", color: "#93c5fd", fontSize: 12 }}>Signal: {aiSafety.floodSignal}</p>
+                    <p style={{ margin: "5px 0 0", color: "#cbd5e1", fontSize: 12, lineHeight: 1.4 }}>{aiSafety.floodNote}</p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
       {/* Hero Section */}
       <section
         className="hero home-hero"
@@ -1343,4 +1765,48 @@ export default function Home() {
       </button>
     </div>
   );
+}
+
+function buildHomeAlert(report: CrowdReport, userLocation: { latitude: number; longitude: number }): HomeAlert {
+  const distance = calcDistanceKm(userLocation, { latitude: report.latitude, longitude: report.longitude });
+  const km = distance.toFixed(1);
+  const title = report.severity === "critical" ? "Critical warning near you" : "Warning near your location";
+  const message =
+    report.severity === "critical"
+      ? `${report.disaster_type.toUpperCase()} report about ${km} km away. Stay safe and monitor updates.`
+      : `${report.disaster_type.toUpperCase()} report about ${km} km away. If safe, consider helping nearby responders.`;
+  return { id: report.id, title, message };
+}
+
+function buildCrowdWsUrl(base: string, path: string): string {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (base.startsWith("http://") || base.startsWith("https://")) {
+    const url = new URL(base);
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    url.pathname = `${url.pathname.replace(/\/$/, "")}${normalizedPath}`;
+    return url.toString();
+  }
+
+  const wsProto = window.location.protocol === "https:" ? "wss" : "ws";
+  const normalizedBase = base.startsWith("/") ? base : `/${base}`;
+  return `${wsProto}://${window.location.host}${normalizedBase.replace(/\/$/, "")}${normalizedPath}`;
+}
+
+function clampScore(value: number): number {
+  return Math.max(5, Math.min(99, Math.round(value)));
+}
+
+function parseReportTimestampMs(value: string, nowMs: number): number | null {
+  if (!value) return null;
+
+  // Backend timestamps without timezone are UTC-origin in our system.
+  const hasTimezone = /[zZ]|[+\-]\d{2}:\d{2}$/.test(value);
+  if (!hasTimezone) {
+    const utcMs = Date.parse(`${value}Z`);
+    if (!Number.isNaN(utcMs)) return utcMs;
+  }
+
+  const localMs = Date.parse(value);
+  return Number.isNaN(localMs) ? null : localMs;
 }

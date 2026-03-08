@@ -4,6 +4,7 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import { API_BASE } from '../config/apiBase';
+import { reverseGeocode } from '../crowd/api/mapApi';
 
 type WeatherData = any;
 
@@ -25,13 +26,9 @@ export default function WeatherCard() {
   // Get location name from reverse geocoding
   const getLocationName = async (lat: number, lon: number) => {
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-      );
-      const data = await res.json();
-      return data.address?.city || data.address?.town || data.address?.county || "Unknown Location";
+      return await reverseGeocode(lat, lon);
     } catch {
-      return "Current Location";
+      return `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
     }
   };
 
